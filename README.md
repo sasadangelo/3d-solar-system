@@ -41,4 +41,4 @@ the command will display an URL that should be something similar to `http://127.
 
 Open your browser and insert the above mentioned URL. You should see a black universe with some random stars, the Sun rotating in the center, all the planets rotating around the Sun. At the moment, the scene is visible only frontally. Here a screenshot of the browser.
 
-[!3D Solar System](docs/3d-solar-system-screenshot.png)
+![3D Solar System](docs/3d-solar-system-screenshot.png)
