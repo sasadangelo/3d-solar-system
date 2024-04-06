@@ -1,3 +1,8 @@
+import {Vector} from './model/Vector.js';
+import {Star} from './model/Star.js';
+import {Planet} from './model/Planet.js';
+import {StarView} from './view/StarView.js';
+
 const OBJECTS = {
     SUN: 'sun',
     MERCURY: 'mercury',
@@ -12,7 +17,7 @@ const OBJECTS = {
     NEPTUNE: 'neptune'
 };
 
-class ObjectGroup {
+/*class ObjectGroup {
     constructor(index, title, radius, extra) {
         const objectGroup = new THREE.Group();
 
@@ -48,24 +53,37 @@ class ObjectGroup {
         return objectMesh;
     };
 }
+*/
+//const planets = [
+//    { title: OBJECTS.MERCURY, radius: 1 },
+//    { title: OBJECTS.VENUS, radius: 2 },
+//    {
+//        title: OBJECTS.EARTH,
+//        radius: 2,
+//        extra: ObjectGroup.createObject(OBJECTS.MOON, new THREE.SphereGeometry(0.5, 64, 32))
+//    },
+//    { title: OBJECTS.MARS, radius: 1 },
+//    { title: OBJECTS.JUPITER, radius: 5 },
+//    {
+//        title: OBJECTS.SATURN,
+//        radius: 4,
+//        extra: ObjectGroup.createObject(OBJECTS.SATURN_RINGS, new THREE.TorusGeometry(6, 1, 2, 32))
+//    },
+//    { title: OBJECTS.URANUS, radius: 3 },
+//    { title: OBJECTS.NEPTUNE, radius: 3 }
+//];
+
+const EARTH_YEAR = (2 * Math.PI) / 365;
 
 const planets = [
-    { title: OBJECTS.MERCURY, radius: 1 },
-    { title: OBJECTS.VENUS, radius: 2 },
-    {
-        title: OBJECTS.EARTH,
-        radius: 2,
-        extra: ObjectGroup.createObject(OBJECTS.MOON, new THREE.SphereGeometry(0.5, 64, 32))
-    },
-    { title: OBJECTS.MARS, radius: 1 },
-    { title: OBJECTS.JUPITER, radius: 5 },
-    {
-        title: OBJECTS.SATURN,
-        radius: 4,
-        extra: ObjectGroup.createObject(OBJECTS.SATURN_RINGS, new THREE.TorusGeometry(6, 1, 2, 32))
-    },
-    { title: OBJECTS.URANUS, radius: 3 },
-    { title: OBJECTS.NEPTUNE, radius: 3 }
+    new Planet(OBJECTS.MERCURY, new Vector(8), 1, EARTH_YEAR * 4),
+    new Planet(OBJECTS.VENUS, new Vector(16), 2, EARTH_YEAR * 2),
+    new Planet(OBJECTS.EARTH, new Vector(24), 2, EARTH_YEAR),
+    new Planet(OBJECTS.MARS, new Vector(32), 1, EARTH_YEAR / 2),
+    new Planet(OBJECTS.JUPITER, new Vector(40), 5, EARTH_YEAR * 4),
+    new Planet(OBJECTS.SATURN, new Vector(48), 4, EARTH_YEAR * 8),
+    new Planet(OBJECTS.URANUS, new Vector(56), 3, EARTH_YEAR * 16),
+    new Planet(OBJECTS.NEPTUNE, new Vector(64), 3, EARTH_YEAR * 32),
 ];
 
 // Inizializzazione della scena
@@ -104,32 +122,33 @@ const stars = new THREE.Points(starsGeometry, starsMaterial);
 
 scene.add(stars);
 
-const sun = ObjectGroup.createObject(OBJECTS.SUN, new THREE.SphereGeometry(11, 64, 32));
+//const sun = ObjectGroup.createObject(OBJECTS.SUN, new THREE.SphereGeometry(11, 64, 32));
+//scene.add(sun);
 
-scene.add(sun);
-
-const planetsMap = new Map();
-
-for (let [index, { title, radius, extra }] of planets.entries()) {
-    const planetGroup = new ObjectGroup(index + 1, title, radius, extra);
-
-    planetsMap.set(title, planetGroup);
-    sun.add(planetGroup);
+// The Sun is a CelestialBodyGroup, this mean it is a group of celestial body that include
+// itself and all the planets
+const sun = new Star(OBJECTS.SUN, new Vector(), 11, 0.001)
+for (let planet of planets) {
+    sun.addCelestialBody(planet);
 }
+// Add the Sun and all the Planets to the Scene
+const sunView = new StarView(sun).addToScene(scene);
 
-const EARTH_YEAR = (2 * Math.PI) / 365;
+//scene.add(sunView.mesh)
+
+//const planetsMap = new Map();
+
+//for (let [index, { title, radius, extra }] of planets.entries()) {
+//    const planetGroup = new ObjectGroup(index + 1, title, radius, extra);
+
+//    planetsMap.set(title, planetGroup);
+//    sun.add(planetGroup);
+//}
+
+//const EARTH_YEAR = (2 * Math.PI) / 365;
 
 const animate = () => {
-    sun.rotation.y += 0.001;
-
-    planetsMap.get(OBJECTS.MERCURY).rotation.y += EARTH_YEAR * 4;
-    planetsMap.get(OBJECTS.VENUS).rotation.y += EARTH_YEAR * 2;
-    planetsMap.get(OBJECTS.EARTH).rotation.y += EARTH_YEAR;
-    planetsMap.get(OBJECTS.MARS).rotation.y += EARTH_YEAR / 2;
-    planetsMap.get(OBJECTS.JUPITER).rotation.y += EARTH_YEAR / 4;
-    planetsMap.get(OBJECTS.SATURN).rotation.y += EARTH_YEAR / 8;
-    planetsMap.get(OBJECTS.URANUS).rotation.y += EARTH_YEAR / 16;
-    planetsMap.get(OBJECTS.NEPTUNE).rotation.y += EARTH_YEAR / 32;
+    sunView.rotate()
 
     renderer.render(scene, camera);
 
