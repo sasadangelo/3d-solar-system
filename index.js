@@ -1,3 +1,6 @@
+import {Star} from './model/Star.js';
+import {Vector} from './model/Vector.js';
+
 const OBJECTS = {
     SUN: 'sun',
     MERCURY: 'mercury',
@@ -104,9 +107,10 @@ const stars = new THREE.Points(starsGeometry, starsMaterial);
 
 scene.add(stars);
 
-const sun = ObjectGroup.createObject(OBJECTS.SUN, new THREE.SphereGeometry(11, 64, 32));
-
-scene.add(sun);
+//const sun = ObjectGroup.createObject(OBJECTS.SUN, new THREE.SphereGeometry(11, 64, 32));
+const sun = new Star(OBJECTS.SUN, new Vector(), 11, 0.001)
+sun.addToScene(scene)
+//scene.add(sun);
 
 const planetsMap = new Map();
 
@@ -114,13 +118,15 @@ for (let [index, { title, radius, extra }] of planets.entries()) {
     const planetGroup = new ObjectGroup(index + 1, title, radius, extra);
 
     planetsMap.set(title, planetGroup);
-    sun.add(planetGroup);
+    //sun.add(planetGroup);
+    sun.mesh.add(planetGroup)
 }
 
 const EARTH_YEAR = (2 * Math.PI) / 365;
 
 const animate = () => {
-    sun.rotation.y += 0.001;
+    //sun.mesh.rotation.y += 0.001;
+    sun.rotate();
 
     planetsMap.get(OBJECTS.MERCURY).rotation.y += EARTH_YEAR * 4;
     planetsMap.get(OBJECTS.VENUS).rotation.y += EARTH_YEAR * 2;
